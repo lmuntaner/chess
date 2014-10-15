@@ -14,9 +14,9 @@ class Game
   
   def play
     # board.place_pieces
-    board.place_check
-    while true
-      p board.in_check?(current_turn)
+    board.place_pieces
+    until board.check_mate?(current_turn)
+      system("clear")
       board.display
       call_turn
       begin
@@ -28,6 +28,9 @@ class Game
       end
       change_turn
     end
+    system("clear")
+    board.display
+    puts "Checkmate! #{change_turn.to_s.capitalize} wins!"
   end
   
   def call_turn
@@ -43,6 +46,5 @@ class Game
   end
 end
 
-game = Game.new
-
-game.play
+# g = Game.new
+# g.play
