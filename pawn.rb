@@ -1,5 +1,5 @@
 # encoding: utf-8
-require './piece'
+require_relative 'piece'
 
 class Pawn < Piece
   attr_reader :first_move
@@ -17,15 +17,15 @@ class Pawn < Piece
   
   def valid_moves
     moves = []
-    move_dirs.each do |unit_move|
+    move_dirs.each do |unit|
       new_position = []
-      2.times { |j| new_position[j] = @position[j] + unit_move[j] }
+      2.times { |j| new_position[j] = @position[j] + unit[j] }
       if on_board?(new_position) && !@board.occupied?(new_position)
         moves << new_position
       end
-      @side_moves = check_diagonals(get_diagonals(new_position))
+      moves += check_diagonals(get_diagonals(new_position)) if unit.first.abs == 1
     end
-    moves += @side_moves
+    moves
   end
   
   def get_diagonals(position)
@@ -39,12 +39,7 @@ class Pawn < Piece
   end
   
   def check_diagonals(sides)
-    diagonals = []
-    sides.each do |side|
-      next unless @board.occupied?(side)
-      diagonals << side if @board[side].color != @color
-    end
-    diagonals
+    sides.select { |side| @board.occupied?(side) && opponent?(side) }
   end
   
   def to_s

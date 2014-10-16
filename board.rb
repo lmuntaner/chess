@@ -1,17 +1,20 @@
 # encoding: utf-8
 require_relative 'rook'
-require './bishop'
-require './queen'
-require './knight'
-require './king'
-require './pawn'
+require_relative 'bishop'
+require_relative 'queen'
+require_relative 'knight'
+require_relative 'king'
+require_relative 'pawn'
 require 'colorize'
+require 'yaml'
+require 'io/console'
 
 class Board
   attr_reader :grid
   
   def initialize
     @grid = Array.new(8) { Array.new(8) }
+    @pointer_pos = [0, 0]
   end
   
   def [](pos)
@@ -22,16 +25,43 @@ class Board
     @grid[pos[0]][pos[1]] = piece
   end
   
+  def move_cursor
+    input = STDIN.getch
+    
+    case input
+    when "a"
+      @pointer_pos[1] -= 1
+      nil
+    when "d"
+      @pointer_pos[1] += 1
+      nil
+    when "s"
+      @pointer_pos[0] += 1
+      nil
+    when "w"
+      @pointer_pos[0] -= 1
+      nil
+    when "o"
+      pos = @pointer_pos.dup
+      pos
+    when "l"
+      pos = @pointer_pos.dup
+      pos
+    when "e"
+      exit
+    end
+  end
+    
   def deep_dup
     dup_board = Board.new()
-    dup_board.grid.each_with_index do |row, index1|
-      row.each_with_index do |col, index2|
-        if self[[index1, index2]].nil?
-          dup_board[[index1, index2]] = nil
+    dup_board.grid.each_with_index do |row, i1|
+      row.each_with_index do |col, i2|
+        if self[[i1, i2]].nil?
+          dup_board[[i1, i2]] = nil
         else
-          color = self[[index1, index2]].color
-          dup_piece = self[[index1, index2]].class.new(dup_board, [index1, index2], color)
-          dup_board[[index1, index2]] = dup_piece
+          color = self[[i1, i2]].color
+          dup_piece = self[[i1, i2]].class.new(dup_board, [i1, i2], color)
+          dup_board[[i1, i2]] = dup_piece
         end
       end
     end
@@ -47,63 +77,23 @@ class Board
   end
   
   def place_pieces
-    place_blacks
-    place_whites
-    self[[5, 6]] = Pawn.new(self, [5, 6], :black)
-  end
-  
-  def place_blacks
-    place_pawns(:black)
-    place_rooks(:black)
-    place_bishops(:black)
-    place_queen(:black)
-    place_king(:black)
-    place_knights(:black)
-  end
-  
-  def place_whites
-    place_pawns(:white)
-    place_rooks(:white)
-    place_bishops(:white)
-    place_queen(:white)
-    place_king(:white)
-    place_knights(:white)
-  end
-  
-  def place_rooks(color)
-    row = init_row(color)
-    [0, 7].each { |col| self[[row, col]] = Rook.new(self, [row, col], color) }
-  end
-  
-  def place_bishops(color)
-    row = init_row(color)
-    [2, 5].each { |col| self[[row, col]] = Bishop.new(self, [row, col], color) }
-  end
-  
-  def place_knights(color)
-    row = init_row(color)
-    [1, 6].each { |col| self[[row, col]] = Knight.new(self, [row, col], color) }
-  end
-  
-  def place_king(color)
-    row = init_row(color)
-    self[[row, 4]] = King.new(self, [row, 4], color)
-  end
-  
-  def place_queen(color)
-    row = init_row(color)
-    self[[row, 3]] = Queen.new(self, [row, 3], color)
-  end
-  
-  def place_pawns(color)
-    row = (color == :black ? 1 : 6)
-    8.times { |col| self[[row, col]] = Pawn.new(self, [row, col], color) }
+    pieces = [Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook]
+    
+    [:black, :white].each do |color|
+      row = init_row(color)
+      pawn_row = (row == 0 ? 1 : 6)
+      pieces.each_with_index do |piece, col|
+        self[[row, col]] = piece.new(self, [row, col], color)
+        self[[pawn_row, col]] = Pawn.new(self, [pawn_row, col], color)
+      end
+    end
   end
   
   def init_row(color)
     color == :black ? 0 : 7
   end
-  
+      
+
   def move(start, final, color)
     raise "No pieces in that position" if self[start].nil?
     raise "That is not your color!" if self[start].color != color
@@ -138,11 +128,14 @@ class Board
   end
   
   def display
-    # system("clear")
+    print "   "
+    ('a'..'h').each { |l| print " #{l} "}
+    puts
     @grid.each_with_index do |row, index1|
-      row_str = []
+      row_str = [" #{(index1 - 8).abs} "]
       row.each_with_index do |el, index2|
         back = (index1 + index2).even? ? :light_white : :white
+        back = :light_blue if @pointer_pos == [index1, index2]
         row_str << (el.nil? ? "   " : el.to_s).colorize(:background => back)
       end
       puts row_str.join("")

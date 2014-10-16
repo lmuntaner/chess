@@ -1,5 +1,5 @@
 # encoding: utf-8
-require './stepping'
+require_relative 'stepping'
 
 class King < SteppingPiece
   

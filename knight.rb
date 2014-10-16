@@ -1,5 +1,5 @@
 # encoding: utf-8
-require './stepping'
+require_relative 'stepping'
 
 class Knight < SteppingPiece
   KNIGHT_MOVES = [[1, 2], [2, 1], [-1, 2], [2, -1],

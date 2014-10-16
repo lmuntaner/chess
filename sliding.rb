@@ -1,4 +1,4 @@
-require './piece'
+require_relative 'piece'
 
 class SlidingPiece < Piece
   
@@ -9,7 +9,7 @@ class SlidingPiece < Piece
       2.times { |j| new_position[j] = @position[j] + (unit_move[j] * i) }
       break unless on_board?(new_position)
       if @board.occupied?(new_position)
-        moves << new_position unless @board[new_position].color == @color
+        moves << new_position if opponent?(new_position)
         break
       else
         moves << new_position

@@ -12,6 +12,12 @@ class Piece
     @first_move = true
   end
   
+  def opponent?(position)
+    raise "Opponent-Method Error!" if board[position].nil?
+    
+    board[position].color != color
+  end
+  
   def on_board?(position)
     position.all? { |x| (0...8).include?(x) }
   end

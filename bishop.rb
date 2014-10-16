@@ -1,5 +1,5 @@
 # encoding: utf-8
-require './sliding'
+require_relative 'sliding'
 
 class Bishop < SlidingPiece
   def move_dirs

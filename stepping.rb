@@ -1,4 +1,4 @@
-require './piece'
+require_relative 'piece'
 
 class SteppingPiece < Piece
   
@@ -8,8 +8,7 @@ class SteppingPiece < Piece
       new_position = []
       2.times { |j| new_position[j] = @position[j] + unit_move[j] }
       next unless on_board?(new_position)
-      next if @board.occupied?(new_position) && 
-              @board[new_position].color == @color
+      next if @board.occupied?(new_position) && !opponent?(new_position)
       moves << new_position
     end
     moves
