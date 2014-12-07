@@ -5,7 +5,7 @@ class Game
   
   def initialize
     @current_turn = :white
-    @board = Board.new
+    @board = Board.new(self)
     @white_time = 0
     @black_time = 0
     @error_message = ""
@@ -48,6 +48,9 @@ class Game
     black_splash = (@current_turn == :black ? " * " : "   ")
     puts "#{white_splash}White Player: #{parse_time(@white_time)}"
     puts "#{black_splash}Black Player: #{parse_time(@black_time)}"
+    puts "Use 'W-A-S-D' to move + 'O' to select and drop a piece"
+    puts "Press 'P' to save game"
+    puts "Press 'E' to exit"
   end
   
   def run
@@ -86,7 +89,7 @@ class Game
   end
   
   def save_game
-    puts "These are your saves files:"
+    puts "These are your saved files:"
     system("ls -1 saved/")
     print "Save as (filename): "
     filename = gets.chomp

@@ -12,9 +12,10 @@ require 'io/console'
 class Board
   attr_reader :grid
   
-  def initialize
+  def initialize(game)
     @grid = Array.new(8) { Array.new(8) }
     @pointer_pos = [0, 0]
+    @game = game
   end
   
   def [](pos)
@@ -47,13 +48,15 @@ class Board
     when "l"
       pos = @pointer_pos.dup
       pos
+    when "p"
+      @game.save_game
     when "e"
       exit
     end
   end
     
   def deep_dup
-    dup_board = Board.new()
+    dup_board = Board.new(@game)
     dup_board.grid.each_with_index do |row, i1|
       row.each_with_index do |col, i2|
         if self[[i1, i2]].nil?
